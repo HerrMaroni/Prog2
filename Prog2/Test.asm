@@ -67,34 +67,28 @@ iban2knr:
 	addiu $a0 $a0 4
 	li $t1 0
 	li $t2 8
+	li $t3 0
 	
-L_1:
+L_BLZ:
 	
-	lb $a1 ($a0)
+	lb $t3 ($a0)
+	sb $t3 ($a1)
 	addiu $a0 $a0 1
 	addiu $a1 $a1 1
 	addiu $t1 $t1 1
-	bne $t1 $t2 L_1
-	
-	la $a0 knrbuf
-	move $t3 $ra
-	jal	println
-	move $ra $t3
-	la $a0 ibanbuf
-	addiu $a0 $a0 12
+	bne $t1 $t2 L_BLZ
 	
 	li $t1 0
 	li $t2 10
 	
-L_2:	
+L_KNR:	
 	
-	lb $a2 ($a0)
+	lb $t3 ($a0)
+	sb $t3 ($a2)
 	addiu $a0 $a0 1
 	addiu $a2 $a2 1
 	addiu $t1 $t1 1
-	bne $t1 $t2 L_2
-	
-	subiu $a2 $a2 10
+	bne $t1 $t2 L_KNR
 	
 	jr	$ra
 	
