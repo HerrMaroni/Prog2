@@ -1,0 +1,23 @@
+#! /bin/sh
+set -eu
+
+BONUSFILE=src/bonus/validateChecksum.s
+if [ ! -f "${BONUSFILE}" ]; then
+    echo "Konnte die Datei \"${BONUSFILE}\" nicht finden. Es wird keine bonusbox gebaut."
+    exit -1;
+fi
+
+
+if [ -z ${1+x} ]; then
+    echo "Bitte geben Sie eine Testdatei als Argument an."
+    echo "Verwendung ./build_bonusbox <TestDatei>.s"
+    exit
+fi
+
+
+SOURCES="src/util.s src/bonus/validateChecksum.s src/moduloStr.s src/knr2iban.s src/iban2knr.s"
+echo "Baue Ordner \"bonusbox\" fuer den Test $1"
+rm -rf bonusbox/*
+mkdir -p bonusbox
+cp $SOURCES $1 bonusbox/
+

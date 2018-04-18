@@ -1,0 +1,17 @@
+#! /bin/sh
+set -eu
+
+
+if [ -z ${1+x} ]; then
+    echo "Bitte geben Sie eine Testdatei als Argument an."
+    echo "Verwendung ./build_testbox <TestDatei>.s"
+    exit
+fi
+
+
+SOURCES="src/util.s src/validateChecksum.s src/moduloStr.s src/knr2iban.s src/iban2knr.s"
+echo "Baue Ordner \"testbox\" fuer den Test $1"
+rm -rf testbox/*
+mkdir -p testbox
+cp $SOURCES $1 testbox/
+
