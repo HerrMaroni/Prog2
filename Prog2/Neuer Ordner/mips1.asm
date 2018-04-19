@@ -5,7 +5,6 @@
 	buchstaben:
 		.word 21
 .text
-	main:
 		la $t0 buchstaben
 		move $t1 $0 # n = Verschiebung
 		move $t2 $0 # Zähler
