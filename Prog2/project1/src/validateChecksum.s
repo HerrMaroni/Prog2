@@ -1,4 +1,10 @@
 	.data
+Iban24:
+	.space 25
+DE2:
+	.ascii "1314"
+	.space 3
+	
 	.globl validate_checksum
 	.text
 
@@ -10,59 +16,75 @@
 validate_checksum:
 	# TODO
 	
-	li $s1 0
-	li $s2 0
-	li $s3 18
-	li $s4 0
+# a0 Puffer der IBAN
+# a1 Iban24
+# a2 DE2
+# t0 Zähler
+# t1 Zwischenspeicher für Adresse zu Adresse
+# t7 Zwischenspeicher Sprungadresse
 
-
-	lb $s1 ($a0)
-	subiu $s1 $s1 54
-	addiu $a0 $a0 1
-	lb $s1 ($a0)
-	subiu $s1 $s1 54
-	addiu $a0 $a0 1
-	lb $s1 ($a0)
-	addiu $a0 $a0 1
-	addiu $s1 $s1 1
-	lb $s1 ($a0)
-	addiu $a0 $a0 1
-	subiu $s1 $s1 3
+Start:
+	la 	$a1 Iban24
+	la 	$a2 DE2
 	
+	addiu 	$a0 2
+	addiu 	$a2 4
 	
-Loop1:
-	lb $s2 ($a0)
-	addiu $a0 $a0 1
-	addiu $s2 $s2 1
-	addiu $s4 $s4 1
+	move 	$t7 $ra
+	li 	$t0 2
+	jal	LDE2
+	li 	$t0 18
+	jal 	L18
+	li 	$t0 6
+	jal 	L6
+	move 	$ra $t7
 	
-	bne $s3 $s4 Loop1
+ModStr Aufruf:
+	la	$a0 Iban24
+	li 	$a1 24
+	li 	$a2 97
 	
-	li $a0 0
-	subiu $s2 $s2 18
-	li $s3 18
-	li $s4 0
-	
-Loop2:
-	lb $a0 ($s2)
-	addiu $a0 $a0 1
-	addiu $s2 $s2 1
-	addiu $s4 $s4 1
-	
-	bne $s3 $s4 Loop2
-	
-	lb $a0 ($s1)
-	addiu $a0 $a0 1
-	addiu $s1 $s1 1
-	lb $a0 ($s1)
-	addiu $a0 $a0 1
-	addiu $s1 $s1 1
-	lb $a0 ($s1)
-	addiu $a0 $a0 1
-	addiu $s1 $s1 1
-	lb $a0 ($s1)
-	
-	
+	subiu	$sp $sp 4
+	sw	$ra ($sp)
+	jal	modulo_str
+	lw	$ra ($sp)
+	addiu	$sp $sp 4
 	
 	
 	jr	$ra
+	
+	
+
+# Loop für IBAN 3-4 nach DE2 5-6
+LDE2:
+	lbu 	$t1 ($a0)
+	sb	$t1 ($a2)	
+	addiu	$a0 $a0 1
+	addiu	$a2 $a2 1
+	
+	subiu 	$t2 $t2 1
+	bnez 	$t2 LDE2
+	subiu	$a2 $a2 6
+	jr 	$ra
+	
+# Loop für IBAN 5-22 nach Iban24 1-18
+L18:
+	lbu 	$t1 ($a0)
+	sb	$t1 ($a1)	
+	addiu	$a0 $a0 1
+	addiu	$a1 $a1 1
+	
+	subiu 	$t2 $t2 1
+	bnez 	$t2 L18
+	jr 	$ra
+	
+# Loop für DE2 1-6 nach Iban24 19-24
+L6:
+	lbu 	$t1 ($a2)
+	sb	$t1 ($a1)	
+	addiu	$a2 $a2 1
+	addiu	$a1 $a1 1
+	
+	subiu 	$t2 $t2 1
+	bnez 	$t2 L6
+	jr 	$ra

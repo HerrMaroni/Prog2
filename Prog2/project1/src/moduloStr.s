@@ -28,8 +28,8 @@ modulo_str:
 	lbu $v0 ($a0)
 	subiu $v0 $v0 48
 
-# Letzte Zahl	
-LZahl:	
+# Eine Zahl	
+EZahl:	
 	addiu $a0 $a0 1
 	beq $a0 $a1 LMod
 
@@ -44,14 +44,17 @@ MZahl:
 	lbu $t2 ($a0)
 	subiu $t2 $t2 48
 	addu $v0 $v0 $t2
+	addiu $a0 $a0 1
+	beq $a0 $a1 LMod
 	mulu $v0 $v0 $t0
-	b LZahl
+	b Mod
 			
 # Letztes Mod			
-Lmod:
+LMod:
 	divu $t1 $v0 $a2
 	mfhi $t1
 	move $v0 $t1
 		
 Ende:
 	jr $ra
+
